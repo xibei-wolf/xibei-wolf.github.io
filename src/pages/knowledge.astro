@@ -1,0 +1,66 @@
+---
+import { PageHeader } from "@components/features/page-header";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPostsList } from "@utils/content-utils";
+import { getCategoryUrl } from "@utils/url-utils";
+
+const posts = (await getSortedPostsList()).filter((post) => !post.data.draft);
+const categories = [...new Set(posts.map((post) => post.data.category?.trim() || "未分类"))];
+const groups = categories.map((name) => ({
+  name,
+  posts: posts.filter((post) => (post.data.category?.trim() || "未分类") === name),
+}));
+---
+
+<MainGridLayout title="知识索引" description="把零散的学习记录，慢慢连接成自己的知识库。">
+  <section class="card-base px-6 py-8 md:px-9 onload-animation" aria-label="知识索引">
+    <PageHeader title="知识索引" />
+    <p class="knowledge-intro">把零散的记录，连接成自己的知识。</p>
+    <p class="knowledge-description">这里按主题收纳已经写下的内容。先记录一个问题，再补上理解、实践与回顾，让每一次学习都有迹可循。</p>
+    <div class="knowledge-summary" aria-label="内容概览">
+      <span>{groups.length} 个主题</span><span>{posts.length} 篇记录</span><a href="/archive/">按时间浏览 →</a>
+    </div>
+  </section>
+
+  {groups.length > 0 ? groups.map((group, index) => (
+    <section class="card-base knowledge-section px-6 py-7 md:px-9" aria-labelledby={`topic-${index}`}>
+      <div class="knowledge-section-heading">
+        <h2 id={`topic-${index}`}>{group.name}</h2>
+        <a href={getCategoryUrl(group.name)}>全部 {group.posts.length} 篇 →</a>
+      </div>
+      <ul class="knowledge-posts">
+        {group.posts.map((post) => (
+          <li>
+            <a href={post.url} class="knowledge-post-link">
+              <span class="knowledge-post-title">{post.data.title}</span>
+              {post.data.description && <span class="knowledge-post-description">{post.data.description}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )) : <section class="card-base px-6 py-8 md:px-9"><p>第一篇记录正在路上。写下一个问题，就从这里开始。</p></section>}
+
+  <section class="card-base knowledge-section px-6 py-7 md:px-9">
+    <h2>慢慢积累，持续生长</h2>
+    <p class="knowledge-description">概念理解、动手实践、问题复盘、阶段回顾。无需一次整理完整；每次多解释清楚一个问题，这里就会丰富一点。</p>
+  </section>
+</MainGridLayout>
+
+<style>
+  .knowledge-intro { color: var(--primary); font-size: 1.15rem; font-weight: 600; margin: 1rem 0 .6rem; }
+  .knowledge-description { color: var(--content-meta); line-height: 1.9; max-width: 42rem; }
+  .knowledge-summary { display: flex; flex-wrap: wrap; gap: .7rem 1.25rem; align-items: center; margin-top: 1.5rem; color: var(--content-meta); font-size: .9rem; }
+  .knowledge-summary a, .knowledge-section-heading a { color: var(--primary); }
+  .knowledge-section { margin-top: 1rem; }
+  h2 { font-size: 1.2rem; font-weight: 700; color: inherit; }
+  .knowledge-section-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; }
+  .knowledge-section-heading a { font-size: .85rem; }
+  .knowledge-posts { margin-top: 1rem; }
+  .knowledge-posts li + li { border-top: 1px solid var(--line-divider); }
+  .knowledge-post-link { display: flex; flex-direction: column; gap: .4rem; padding: 1rem 0; border-radius: .4rem; }
+  .knowledge-post-link:hover .knowledge-post-title { color: var(--primary); }
+  .knowledge-post-title { font-weight: 600; color: inherit; transition: color .2s; }
+  .knowledge-post-description { color: var(--content-meta); line-height: 1.7; font-size: .9rem; }
+  a:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; }
+</style>
