@@ -1,5 +1,13 @@
 # Third-Party Notices
 
+## ascii.rest
+
+- Source: https://github.com/bas3line/ascii
+- Version: 0.4.0 (official npm distribution)
+- License: MIT, Copyright (c) 2026 bas3line
+- Usage: Homepage canvas renderer and 78 lazily loaded animated scenes.
+- Full license: `src/vendor/ascii-rest/LICENSE`
+
 This project includes portions adapted from the following open-source project.
 
 ## Firefly

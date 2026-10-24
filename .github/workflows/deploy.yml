@@ -31,6 +31,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Check Astro pages
         run: pnpm check
+      - name: Check animated scene modules
+        run: node --experimental-strip-types --test tests/ascii-scenes.test.mjs
       - name: Build blog and search index
         run: pnpm build
       - uses: actions/upload-pages-artifact@v3

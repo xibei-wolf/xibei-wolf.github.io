@@ -1,0 +1,74 @@
+---
+import { asciiCategories, asciiScenes } from "../../config/asciiBannerConfig";
+import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
+---
+
+<section id="ascii-banner" class="ascii-banner" aria-label="首页动态光景" style={`--ascii-top: ${BANNER_HEIGHT_EXTEND}vh`}>
+	<div class="ascii-stage" aria-hidden="true"><canvas></canvas></div>
+	<button type="button" class="ascii-trigger" aria-haspopup="dialog" aria-controls="ascii-picker" hidden>
+		<span>光景 · <span data-scene-label>极光峡湾</span></span><span aria-hidden="true">⌄</span>
+	</button>
+	<dialog id="ascii-picker" aria-labelledby="ascii-picker-title">
+		<div class="ascii-picker-heading">
+			<div><h2 id="ascii-picker-title">选择光景</h2><p>{asciiScenes.length} 种片刻，留一处给今天的心情。</p></div>
+			<button type="button" data-close aria-label="关闭场景选择">✕</button>
+		</div>
+		<label class="ascii-search"><span class="sr-only">搜索场景名称</span><input type="search" placeholder="搜索光景，如：极光、星空、雨…" autocomplete="off" /></label>
+		<div class="ascii-categories" role="group" aria-label="场景分类">
+			<button type="button" data-category="" aria-pressed="true">全部 <small>{asciiScenes.length}</small></button>
+			{asciiCategories.map(({ label, count }) => <button type="button" data-category={label} aria-pressed="false">{label} <small>{count}</small></button>)}
+		</div>
+		<div class="ascii-options" role="group" aria-label="可选光景">
+			{asciiScenes.map(({ id, label, category }) => <button type="button" data-scene={id} data-group={category} aria-pressed="false"><span>{label}</span><small>{id}</small></button>)}
+		</div>
+		<p class="ascii-empty" hidden>暂时没有找到，换个词试试。</p>
+		<div class="ascii-picker-footer">
+			<span data-status role="status" aria-live="polite"></span>
+			<div><button type="button" data-random>随机一景 ↗</button><button type="button" data-pause aria-pressed="false">暂停动效</button></div>
+		</div>
+	</dialog>
+</section>
+
+<script>
+	import { initAsciiBackdrop } from "../../scripts/ascii-backdrop";
+	initAsciiBackdrop();
+</script>
+
+<style>
+	.ascii-banner { position:absolute; inset:0; z-index:2; pointer-events:none; transition:background .4s; }
+	:global(html:not([data-layout-variant="home"])) .ascii-banner { display:none; }
+	/* Keep the existing navigation readable over both light and dark scenes. */
+	:global(html[data-layout-variant="home"] body:has(#ascii-banner) #navbar[data-transparent-mode] > div) { background:var(--card-bg); border-color:transparent; }
+	.ascii-stage { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; overflow:hidden; }
+	.ascii-stage canvas { max-width:100%; height:auto; flex:none; color:#b6d8c9; opacity:0; mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent); }
+	.ascii-banner[data-ready] .ascii-stage canvas { opacity:1; }
+	.ascii-trigger { pointer-events:auto; position:absolute; right:max(1.25rem,calc((100vw - 78rem)/2)); bottom:3.5rem; display:flex; align-items:center; gap:1.4rem; padding:.65rem 1rem; border:1px solid #ffffff30; border-radius:999px; background:#0b1726a8; color:#eef6f3; backdrop-filter:blur(16px); font-size:.82rem; cursor:pointer; }
+	.ascii-trigger[hidden] { display:none; }
+	button:focus-visible,input:focus-visible { outline:2px solid #77bba7; outline-offset:3px; }
+	button { cursor:pointer; }
+	dialog { pointer-events:auto; width:min(720px,calc(100vw - 2rem)); max-height:85dvh; margin:auto; padding:1.6rem; border:1px solid #8b9f9c30; border-radius:1.3rem; color:var(--primary-text-color,#20342e); background:var(--card-bg,#fff); box-shadow:0 30px 100px #0005; overflow:auto; }
+	dialog::backdrop { background:#08121c88; backdrop-filter:blur(8px); }
+	.ascii-picker-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+	h2 { font-size:1.45rem; font-weight:600; letter-spacing:.04em; }
+	.ascii-picker-heading p { font-size:.85rem; opacity:.6; margin:.35rem 0 1.25rem; }
+	[data-close] { padding:.3rem .6rem; border-radius:50%; }
+	.ascii-search input { width:100%; padding:.8rem 1rem; background:#829a8e12; border:1px solid #829a8e30; border-radius:.7rem; font-size:.9rem; }
+	.ascii-categories { display:flex; flex-wrap:wrap; gap:.45rem; margin:1rem 0; }
+	.ascii-categories button { padding:.4rem .6rem; border-radius:.5rem; font-size:.8rem; }
+	small { opacity:.5; }
+	.ascii-categories small { margin-left:.2rem; }
+	.ascii-categories [aria-pressed="true"] { background:#739b8528; color:var(--primary); }
+	.ascii-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; max-height:40dvh; overflow:auto; padding:3px; }
+	.ascii-options button { display:flex; flex-direction:column; align-items:flex-start; gap:.25rem; text-align:left; border:1px solid #829a8e25; border-radius:.65rem; padding:.7rem .8rem; min-width:0; }
+	.ascii-options button:hover { background:#829a8e10; }
+	.ascii-options button[aria-pressed="true"] { background:#739b851c; border-color:#739b85; }
+	.ascii-options small { font-size:.68rem; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+	.ascii-options button[hidden],.ascii-empty[hidden] { display:none; }
+	.ascii-empty { padding:2rem; text-align:center; opacity:.6; }
+	.ascii-picker-footer { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-top:1.2rem; font-size:.8rem; }
+	.ascii-picker-footer [data-status] { opacity:.65; }
+	.ascii-picker-footer > div { display:flex; gap:.6rem; flex-shrink:0; }
+	.ascii-picker-footer button { padding:.5rem .65rem; border:1px solid #829a8e30; border-radius:.5rem; }
+	@media(min-width:1280px) { .ascii-stage { top:var(--ascii-top); } }
+	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:4rem; } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
+</style>

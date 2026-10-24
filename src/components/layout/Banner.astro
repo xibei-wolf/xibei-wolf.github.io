@@ -11,6 +11,8 @@ import { Icon } from "astro-icon/components";
 import { siteConfig } from "../../config";
 import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
 import { getImageFormats, getImageQuality } from "../../utils/image-utils";
+import { asciiBannerConfig } from "../../config/asciiBannerConfig";
+import AsciiBackdrop from "./AsciiBackdrop.astro";
 
 interface Props {
 	// Banner 配置
@@ -595,7 +597,8 @@ const bannerFormats = getImageFormats();
 		</script>
 
 	<!-- 首页文字覆盖层 -->
-	{siteConfig.banner.homeText?.enable && (
+	{asciiBannerConfig.enable && <AsciiBackdrop />}
+	{!asciiBannerConfig.enable && siteConfig.banner.homeText?.enable && (
 		<div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showTextOverlay ? "hidden" : ""}`}>
 			<div class="w-4/5 lg:w-3/4 text-center mb-0">
 				<div class="flex flex-col">
