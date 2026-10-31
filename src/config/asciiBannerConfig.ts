@@ -3,6 +3,7 @@ export const asciiBannerConfig = {
 	enable: true,
 	defaultScene: "aurora-fjord",
 	maxFps: 15,
+	maxCanvasWidth: 1920,
 };
 
 const groups = [

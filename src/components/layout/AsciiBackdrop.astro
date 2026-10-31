@@ -1,9 +1,9 @@
 ---
 import { asciiCategories, asciiScenes } from "../../config/asciiBannerConfig";
-import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
+import { BANNER_HEIGHT } from "../../constants/constants";
 ---
 
-<section id="ascii-banner" class="ascii-banner" aria-label="首页动态光景" style={`--ascii-top: ${BANNER_HEIGHT_EXTEND}vh`}>
+<section id="ascii-banner" class="ascii-banner" aria-label="首页动态光景" style={`--ascii-main-top: ${BANNER_HEIGHT}vh`}>
 	<div class="ascii-stage" aria-hidden="true"><canvas></canvas></div>
 	<button type="button" class="ascii-trigger" aria-haspopup="dialog" aria-controls="ascii-picker" hidden>
 		<span>光景 · <span data-scene-label>极光峡湾</span></span><span aria-hidden="true">⌄</span>
@@ -69,6 +69,9 @@ import { BANNER_HEIGHT_EXTEND } from "../../constants/constants";
 	.ascii-picker-footer [data-status] { opacity:.65; }
 	.ascii-picker-footer > div { display:flex; gap:.6rem; flex-shrink:0; }
 	.ascii-picker-footer button { padding:.5rem .65rem; border:1px solid #829a8e30; border-radius:.5rem; }
-	@media(min-width:1280px) { .ascii-stage { top:var(--ascii-top); } }
+	@media(min-width:1280px) {
+		/* Keep the trigger above the content panel and animated waves. */
+		.ascii-trigger { top:clamp(6rem,calc(var(--ascii-main-top) - 3.75rem),18rem); bottom:auto; }
+	}
 	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:4rem; } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
 </style>

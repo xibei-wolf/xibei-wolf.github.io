@@ -42,7 +42,13 @@ export function initAsciiBackdrop() {
 	function fit() {
 		if (!current || !stage.clientWidth || !stage.clientHeight) return;
 		const { cols, rows, cell = 2 } = current.meta;
-		canvas.style.width = `${Math.min(stage.clientWidth, stage.clientHeight * cols / (rows * cell), 1200)}px`;
+		const aspectRatio = cols / (rows * cell);
+		const width = Math.min(
+			stage.clientWidth,
+			stage.clientHeight * aspectRatio,
+			asciiBannerConfig.maxCanvasWidth,
+		);
+		canvas.style.width = `${Math.max(1, width)}px`;
 	}
 	function render() {
 		stop?.(); stop = undefined;
