@@ -43,11 +43,15 @@ export function initAsciiBackdrop() {
 		if (!current || !stage.clientWidth || !stage.clientHeight) return;
 		const { cols, rows, cell = 2 } = current.meta;
 		const aspectRatio = cols / (rows * cell);
-		const width = Math.min(
-			stage.clientWidth,
-			stage.clientHeight * aspectRatio,
-			asciiBannerConfig.maxCanvasWidth,
-		);
+		const heightMatchedWidth = stage.clientHeight * aspectRatio;
+		const width =
+			stage.clientWidth < heightMatchedWidth
+				? Math.min(heightMatchedWidth, asciiBannerConfig.maxCanvasWidth)
+				: Math.min(
+						stage.clientWidth,
+						heightMatchedWidth,
+						asciiBannerConfig.maxCanvasWidth,
+					);
 		canvas.style.width = `${Math.max(1, width)}px`;
 	}
 	function render() {

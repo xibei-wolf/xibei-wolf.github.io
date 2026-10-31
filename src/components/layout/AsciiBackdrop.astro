@@ -40,7 +40,7 @@ import { BANNER_HEIGHT } from "../../constants/constants";
 	/* Keep the existing navigation readable over both light and dark scenes. */
 	:global(html[data-layout-variant="home"] body:has(#ascii-banner) #navbar[data-transparent-mode] > div) { background:var(--card-bg); border-color:transparent; }
 	.ascii-stage { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; overflow:hidden; }
-	.ascii-stage canvas { max-width:100%; height:auto; flex:none; color:#b6d8c9; opacity:0; mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent); }
+	.ascii-stage canvas { max-width:none; height:auto; flex:none; color:#b6d8c9; opacity:0; mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent); }
 	.ascii-banner[data-ready] .ascii-stage canvas { opacity:1; }
 	.ascii-trigger { pointer-events:auto; position:absolute; right:max(1.25rem,calc((100vw - 78rem)/2)); bottom:3.5rem; display:flex; align-items:center; gap:1.4rem; padding:.65rem 1rem; border:1px solid #ffffff30; border-radius:999px; background:#0b1726a8; color:#eef6f3; backdrop-filter:blur(16px); font-size:.82rem; cursor:pointer; }
 	.ascii-trigger[hidden] { display:none; }
@@ -73,5 +73,5 @@ import { BANNER_HEIGHT } from "../../constants/constants";
 		/* Keep the trigger above the content panel and animated waves. */
 		.ascii-trigger { top:clamp(6rem,calc(var(--ascii-main-top) - 3.75rem),18rem); bottom:auto; }
 	}
-	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:4rem; } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
+	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:clamp(5.5rem,15vh,9rem); } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
 </style>

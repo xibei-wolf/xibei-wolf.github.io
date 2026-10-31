@@ -139,7 +139,7 @@ const iconWebpSrc = hasIconPngFallback
                 return <DropdownMenu link={l} />;
             })}
         </div>
-        <div class="flex items-center gap-1">
+        <div id="navbar-controls" class="flex items-center gap-1">
             <div id="search-container">
                 <Search client:only="svelte"></Search>
             </div>
@@ -308,6 +308,23 @@ if (document.readyState === 'loading') {
     initSemifullScrollDetection();
 }
 </script>
+
+<style>
+	@media (max-width: 359px) {
+		:global(#navbar > div > a) {
+			padding-inline: 0.625rem;
+		}
+
+		:global(#navbar-controls) {
+			gap: 0;
+		}
+
+		:global(#navbar-controls button) {
+			width: 2.5rem;
+			height: 2.5rem;
+		}
+	}
+</style>
 
 <script is:inline>
 window.loadPagefind = async function() {
