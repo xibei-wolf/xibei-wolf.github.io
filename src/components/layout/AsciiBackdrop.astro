@@ -73,5 +73,20 @@ import { BANNER_HEIGHT } from "../../constants/constants";
 		/* Keep the trigger above the content panel and animated waves. */
 		.ascii-trigger { top:clamp(6rem,calc(var(--ascii-main-top) - 3.75rem),18rem); bottom:auto; }
 	}
+	@media(max-width:767px) {
+		:global(html[data-layout-variant="home"] body:has(#ascii-banner)) {
+			--ascii-mobile-banner-height:clamp(210px,min(62vw,44dvh),440px);
+		}
+		:global(html[data-layout-variant="home"] body:has(#ascii-banner) #banner-wrapper:not(.mobile-hide-banner)) {
+			height:var(--ascii-mobile-banner-height) !important;
+			min-height:0 !important;
+			max-height:none !important;
+			top:0 !important;
+		}
+		:global(html[data-layout-variant="home"] body:has(#ascii-banner) .absolute.w-full.z-30:not(.mobile-main-no-banner)) {
+			top:var(--ascii-mobile-banner-height) !important;
+			min-height:calc(100dvh - var(--ascii-mobile-banner-height)) !important;
+		}
+	}
 	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:4rem; } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
 </style>
