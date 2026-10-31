@@ -324,6 +324,7 @@ enum I18nKey {
 	settingsWallpaper = "settingsWallpaper",
 	settingsWallpaperEffects = "settingsWallpaperEffects",
 	settingsBanner = "settingsBanner",
+	asciiBannerScene = "asciiBannerScene",
 	settingsEffects = "settingsEffects",
 	settingsLayout = "settingsLayout",
 	settingsFeatures = "settingsFeatures",

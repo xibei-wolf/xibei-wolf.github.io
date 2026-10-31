@@ -1,13 +1,9 @@
 ---
 import { asciiCategories, asciiScenes } from "../../config/asciiBannerConfig";
-import { BANNER_HEIGHT } from "../../constants/constants";
 ---
 
-<section id="ascii-banner" class="ascii-banner" aria-label="首页动态光景" style={`--ascii-main-top: ${BANNER_HEIGHT}vh`}>
+<section id="ascii-banner" class="ascii-banner" aria-label="首页动态光景">
 	<div class="ascii-stage" aria-hidden="true"><canvas></canvas></div>
-	<button type="button" class="ascii-trigger" aria-haspopup="dialog" aria-controls="ascii-picker" hidden>
-		<span>光景 · <span data-scene-label>极光峡湾</span></span><span aria-hidden="true">⌄</span>
-	</button>
 	<dialog id="ascii-picker" aria-labelledby="ascii-picker-title">
 		<div class="ascii-picker-heading">
 			<div><h2 id="ascii-picker-title">选择光景</h2><p>{asciiScenes.length} 种片刻，留一处给今天的心情。</p></div>
@@ -42,8 +38,6 @@ import { BANNER_HEIGHT } from "../../constants/constants";
 	.ascii-stage { position:absolute; inset:0; display:flex; justify-content:center; align-items:center; overflow:hidden; }
 	.ascii-stage canvas { max-width:100%; height:auto; flex:none; color:#b6d8c9; opacity:0; mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent); }
 	.ascii-banner[data-ready] .ascii-stage canvas { opacity:1; }
-	.ascii-trigger { pointer-events:auto; position:absolute; right:max(1.25rem,calc((100vw - 78rem)/2)); bottom:3.5rem; display:flex; align-items:center; gap:1.4rem; padding:.65rem 1rem; border:1px solid #ffffff30; border-radius:999px; background:#0b1726a8; color:#eef6f3; backdrop-filter:blur(16px); font-size:.82rem; cursor:pointer; }
-	.ascii-trigger[hidden] { display:none; }
 	button:focus-visible,input:focus-visible { outline:2px solid #77bba7; outline-offset:3px; }
 	button { cursor:pointer; }
 	dialog { pointer-events:auto; width:min(720px,calc(100vw - 2rem)); max-height:85dvh; margin:auto; padding:1.6rem; border:1px solid #8b9f9c30; border-radius:1.3rem; color:var(--primary-text-color,#20342e); background:var(--card-bg,#fff); box-shadow:0 30px 100px #0005; overflow:auto; }
@@ -69,24 +63,23 @@ import { BANNER_HEIGHT } from "../../constants/constants";
 	.ascii-picker-footer [data-status] { opacity:.65; }
 	.ascii-picker-footer > div { display:flex; gap:.6rem; flex-shrink:0; }
 	.ascii-picker-footer button { padding:.5rem .65rem; border:1px solid #829a8e30; border-radius:.5rem; }
-	@media(min-width:1280px) {
-		/* Keep the trigger above the content panel and animated waves. */
-		.ascii-trigger { top:clamp(6rem,calc(var(--ascii-main-top) - 3.75rem),18rem); bottom:auto; }
-	}
 	@media(max-width:767px) {
 		:global(html[data-layout-variant="home"] body:has(#ascii-banner)) {
-			--ascii-mobile-banner-height:clamp(210px,min(62vw,44dvh),440px);
+			--ascii-mobile-nav-clearance:4.5rem;
+			--ascii-mobile-scene-height:clamp(160px,min(50vw,32dvh),360px);
+			--ascii-mobile-banner-height:calc(var(--ascii-mobile-nav-clearance) + var(--ascii-mobile-scene-height) + 0.5rem);
 		}
-		:global(html[data-layout-variant="home"] body:has(#ascii-banner) #banner-wrapper:not(.mobile-hide-banner)) {
+		:global(html[data-layout-variant="home"] body.enable-banner:not(.fullscreen-banner):has(#ascii-banner) .ascii-stage) { top:var(--ascii-mobile-nav-clearance); }
+		:global(html[data-layout-variant="home"] body.enable-banner:not(.fullscreen-banner):has(#ascii-banner) #banner-wrapper:not(.mobile-hide-banner)) {
 			height:var(--ascii-mobile-banner-height) !important;
 			min-height:0 !important;
 			max-height:none !important;
 			top:0 !important;
 		}
-		:global(html[data-layout-variant="home"] body:has(#ascii-banner) .absolute.w-full.z-30:not(.mobile-main-no-banner)) {
+		:global(html[data-layout-variant="home"] body.enable-banner:not(.fullscreen-banner):has(#ascii-banner) .absolute.w-full.z-30:not(.mobile-main-no-banner)) {
 			top:var(--ascii-mobile-banner-height) !important;
 			min-height:calc(100dvh - var(--ascii-mobile-banner-height)) !important;
 		}
 	}
-	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-trigger { bottom:4rem; } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
+	@media(max-width:600px) { dialog { padding:1.1rem; } .ascii-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .ascii-picker-footer { align-items:flex-start; flex-direction:column; } }
 </style>

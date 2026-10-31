@@ -6,6 +6,10 @@ export const asciiBannerConfig = {
 	maxCanvasWidth: 1920,
 };
 
+export const asciiSceneStorageKey = "growth-journal:ascii-scene";
+export const asciiPickerOpenEvent = "ascii-banner:open-picker";
+export const asciiSceneChangeEvent = "ascii-banner:scene-change";
+
 const groups = [
 	["风景漫游", "alpine-dawn:雪山破晓|aurora-fjord:极光峡湾|deep-reef:深海珊瑚|desert-night:沙漠之夜|earthrise:地球升起|kyoto-dusk:京都暮色|lantern-lake:灯火湖畔|marine-drive:滨海大道|misty-forest:雾中森林|night-coast:静夜海岸|ocean-sunset:海上落日|storm-plains:风暴原野|taj-dawn:泰姬晨光|tokyo-rain:东京雨夜|varanasi-ghats:恒河晨曦|lighthouse:灯塔|skyline:城市天际线"],
 	["自然生息", "aurora:极光|bonsai:盆景|campfire:篝火|cherry-blossom:樱花|contour-map:等高线|fern:蕨叶|fireflies:萤火虫|fractal-tree:分形树|landscape:山水|lightning:闪电|rain:雨幕|ruled-mountains:层峦|sea-swell:海浪|snowfall:落雪|sunrise:日出|wind:风的形状"],
@@ -24,3 +28,11 @@ export const asciiCategories = groups.map(([label]) => ({
 	label,
 	count: asciiScenes.filter((scene) => scene.category === label).length,
 }));
+
+export function resolveAsciiScene(id?: string | null) {
+	return (
+		asciiScenes.find((scene) => scene.id === id) ??
+		asciiScenes.find((scene) => scene.id === asciiBannerConfig.defaultScene) ??
+		asciiScenes[0]
+	);
+}

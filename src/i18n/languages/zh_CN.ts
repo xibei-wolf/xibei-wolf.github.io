@@ -332,6 +332,7 @@ export const zh_CN: Translation = {
 	[Key.settingsWallpaper]: "壁纸",
 	[Key.settingsWallpaperEffects]: "壁纸效果",
 	[Key.settingsBanner]: "横幅选项",
+	[Key.asciiBannerScene]: "首页光景",
 	[Key.settingsEffects]: "特效",
 	[Key.settingsLayout]: "布局",
 	[Key.settingsFeatures]: "功能",

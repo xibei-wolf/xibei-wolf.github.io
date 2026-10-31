@@ -38,6 +38,13 @@ import {
 } from "@utils/setting-utils";
 import { onMount } from "svelte";
 import { fullscreenWallpaperConfig, sakuraConfig, siteConfig } from "@/config";
+import {
+	asciiBannerConfig,
+	asciiPickerOpenEvent,
+	asciiSceneChangeEvent,
+	asciiSceneStorageKey,
+	resolveAsciiScene,
+} from "@/config/asciiBannerConfig";
 
 import type { WALLPAPER_MODE } from "@/types/config";
 
@@ -88,6 +95,9 @@ const isUltrawidePostLayoutSwitchable =
 
 const showModeValue = siteConfig.wallpaperMode.showModeSwitchOnMobile;
 let isMobile = $state(false);
+let isHomePage = $state(false);
+const defaultAsciiScene = resolveAsciiScene(asciiBannerConfig.defaultScene);
+let asciiSceneLabel = $state(defaultAsciiScene.label);
 
 const isWallpaperModeSwitchable = $derived(
 	(showModeValue === "both" ||
@@ -104,12 +114,19 @@ const hasAnyContent = $derived(
 		hasOverlaySettings ||
 		hasBannerSettings ||
 		isSakuraSwitchable ||
-		isUltrawidePostLayoutSwitchable,
+		isUltrawidePostLayoutSwitchable ||
+		asciiBannerConfig.enable,
 );
 
 let hue = $state(getHue());
 const defaultHue = getDefaultHue();
 let wallpaperMode = $state(defaultWallpaperMode as WALLPAPER_MODE);
+const showAsciiSceneSettings = $derived(
+	asciiBannerConfig.enable &&
+		isHomePage &&
+		(wallpaperMode === WALLPAPER_BANNER ||
+			wallpaperMode === WALLPAPER_FULLSCREEN),
+);
 let currentLayout = $state(defaultLayout);
 let overlayOpacity = $state(getDefaultOverlayOpacity());
 const defaultOverlayOpacity = getDefaultOverlayOpacity();
@@ -219,6 +236,27 @@ function switchWallpaperMode(newMode: WALLPAPER_MODE) {
 	}
 }
 
+function syncAsciiSceneLabel() {
+	asciiSceneLabel = resolveAsciiScene(
+		localStorage.getItem(asciiSceneStorageKey),
+	).label;
+}
+
+function handleAsciiSceneChange(event: Event) {
+	const detail = (event as CustomEvent<{ id?: string }>).detail;
+	asciiSceneLabel = detail?.id
+		? resolveAsciiScene(detail.id).label
+		: resolveAsciiScene(localStorage.getItem(asciiSceneStorageKey)).label;
+}
+
+function openAsciiScenePicker(event: MouseEvent) {
+	window.dispatchEvent(
+		new CustomEvent(asciiPickerOpenEvent, {
+			detail: { trigger: event.currentTarget as HTMLElement },
+		}),
+	);
+}
+
 function switchLayout() {
 	currentLayout = currentLayout === "list" ? "grid" : "list";
 	localStorage.setItem("postListLayout", currentLayout);
@@ -273,7 +311,20 @@ onMount(() => {
 
 	refreshAllRangeProgress();
 	checkMobile();
+	syncAsciiSceneLabel();
+	isHomePage =
+		document.documentElement.dataset.layoutVariant === "home";
 	window.addEventListener("resize", checkMobile);
+	window.addEventListener(asciiSceneChangeEvent, handleAsciiSceneChange);
+
+	const layoutObserver = new MutationObserver(() => {
+		isHomePage =
+			document.documentElement.dataset.layoutVariant === "home";
+	});
+	layoutObserver.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ["data-layout-variant"],
+	});
 
 	const panel = document.getElementById("display-setting");
 	let handleRangeInput: ((event: Event) => void) | undefined;
@@ -289,6 +340,11 @@ onMount(() => {
 
 	return () => {
 		window.removeEventListener("resize", checkMobile);
+		window.removeEventListener(
+			asciiSceneChangeEvent,
+			handleAsciiSceneChange,
+		);
+		layoutObserver.disconnect();
 		if (panel && handleRangeInput) {
 			panel.removeEventListener("input", handleRangeInput);
 		}
@@ -543,7 +599,7 @@ $effect(() => {
 		</div>
 	{/if}
 
-	{#if (wallpaperMode === WALLPAPER_BANNER || wallpaperMode === WALLPAPER_FULLSCREEN) && hasBannerSettings}
+	{#if (wallpaperMode === WALLPAPER_BANNER || wallpaperMode === WALLPAPER_FULLSCREEN) && (hasBannerSettings || showAsciiSceneSettings)}
 		<div class="mt-2 mb-2">
 			<div
 				class="flex gap-2 font-bold text-lg text-neutral-900 dark:text-neutral-100 transition relative ml-3 mb-2
@@ -564,6 +620,21 @@ $effect(() => {
 				</button>
 			</div>
 			<div class="space-y-1">
+				{#if showAsciiSceneSettings}
+				<button
+					id="ascii-scene-settings-button"
+					type="button"
+					class="w-full btn-regular rounded-md py-2 px-3 flex items-center gap-3 text-left active:scale-95 transition-all relative overflow-hidden"
+					aria-haspopup="dialog"
+					aria-controls="ascii-picker"
+					onclick={openAsciiScenePicker}
+				>
+					<Icon icon="material-symbols:landscape-outline-rounded" class="text-[1.25rem] shrink-0" />
+					<span class="text-sm flex-1">{i18n(I18nKey.asciiBannerScene)}</span>
+					<span class="max-w-[8rem] truncate text-xs opacity-60">{asciiSceneLabel}</span>
+					<Icon icon="material-symbols:chevron-right-rounded" class="text-[1rem] shrink-0 opacity-50" />
+				</button>
+				{/if}
 				{#if isBannerTitleSwitchable}
 				<button
 					class="w-full btn-regular rounded-md py-2 px-3 flex items-center gap-3 text-left active:scale-95 transition-all relative overflow-hidden"

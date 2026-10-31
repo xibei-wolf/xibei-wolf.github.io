@@ -244,6 +244,7 @@ export const ja: Translation = {
 	[Key.settingsWallpaper]: "壁紙",
 	[Key.settingsWallpaperEffects]: "壁紙効果",
 	[Key.settingsBanner]: "バナーオプション",
+	[Key.asciiBannerScene]: "ホーム風景",
 	[Key.settingsEffects]: "エフェクト",
 	[Key.settingsLayout]: "レイアウト",
 	[Key.settingsFeatures]: "機能",

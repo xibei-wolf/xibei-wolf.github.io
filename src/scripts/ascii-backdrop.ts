@@ -1,10 +1,16 @@
-import { asciiBannerConfig, asciiScenes } from "../config/asciiBannerConfig";
+import {
+	asciiBannerConfig,
+	asciiPickerOpenEvent,
+	asciiSceneChangeEvent,
+	asciiSceneStorageKey,
+	asciiScenes,
+	resolveAsciiScene,
+} from "../config/asciiBannerConfig";
 import { mount } from "../vendor/ascii-rest/mount.js";
 import type { Piece } from "../vendor/ascii-rest/types";
 
 // Every scene becomes a local, lazy-loaded chunk; only the selected one is fetched.
 const pieces = import.meta.glob<Piece>("../vendor/ascii-rest/pieces/*.js");
-const storageKey = "growth-journal:ascii-scene";
 const pauseKey = "growth-journal:ascii-paused";
 
 export function initAsciiBackdrop() {
@@ -13,8 +19,6 @@ export function initAsciiBackdrop() {
 	root.dataset.initialized = "true";
 	const stage = root.querySelector<HTMLElement>(".ascii-stage")!;
 	const canvas = root.querySelector("canvas")!;
-	const trigger = root.querySelector<HTMLButtonElement>(".ascii-trigger")!;
-	const label = root.querySelector<HTMLElement>("[data-scene-label]")!;
 	const dialog = root.querySelector<HTMLDialogElement>("dialog")!;
 	const search = root.querySelector<HTMLInputElement>("input")!;
 	const status = root.querySelector<HTMLElement>("[data-status]")!;
@@ -24,8 +28,7 @@ export function initAsciiBackdrop() {
 	const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 	const read = (key: string) => { try { return localStorage.getItem(key); } catch { return null; } };
 	const save = (key: string, value: string) => { try { localStorage.setItem(key, value); } catch { /* Storage is optional. */ } };
-	let selected = read(storageKey) || asciiBannerConfig.defaultScene;
-	if (!asciiScenes.some((scene) => scene.id === selected)) selected = asciiBannerConfig.defaultScene;
+	let selected = resolveAsciiScene(read(asciiSceneStorageKey)).id;
 	let paused = read(pauseKey) === "true";
 	let explicitPlay = false;
 	let current: Piece | undefined;
@@ -33,6 +36,7 @@ export function initAsciiBackdrop() {
 	let request = 0;
 	let category = "";
 	let suspended = false;
+	let lastTrigger: HTMLElement | null = null;
 	const isHome = () => document.documentElement.dataset.layoutVariant === "home";
 	const isStill = () => paused || (reduced.matches && !explicitPlay);
 	function controls() {
@@ -72,12 +76,13 @@ export function initAsciiBackdrop() {
 			current = next;
 			try { render(); } catch (error) { current = previous; render(); throw error; }
 			selected = id;
-			label.textContent = scene.label;
 			root!.style.backgroundColor = next.meta.ground || "#09161b";
 			root!.dataset.ready = "true";
+			root!.dataset.scene = id;
 			for (const button of sceneButtons) button.setAttribute("aria-pressed", String(button.dataset.scene === id));
-			save(storageKey, id);
+			save(asciiSceneStorageKey, id);
 			status.textContent = `当前：${scene.label}`;
+			window.dispatchEvent(new CustomEvent(asciiSceneChangeEvent, { detail: { id, label: scene.label } }));
 			controls();
 		} catch {
 			if (generation === request) status.textContent = "暂时未能加载，请重试或选择其他光景。";
@@ -92,9 +97,21 @@ export function initAsciiBackdrop() {
 		}
 		root!.querySelector<HTMLElement>(".ascii-empty")!.hidden = count > 0;
 	}
-	trigger.hidden = false;
-	trigger.addEventListener("click", () => { dialog.showModal(); search.focus(); });
-	dialog.addEventListener("close", () => trigger.focus({ preventScroll: true }));
+	function openPicker(trigger?: HTMLElement | null) {
+		if (!isHome() || dialog.open) return;
+		lastTrigger = trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+		dialog.showModal();
+		requestAnimationFrame(() => search.focus({ preventScroll: true }));
+	}
+	function handlePickerOpen(event: Event) {
+		const detail = (event as CustomEvent<{ trigger?: HTMLElement }>).detail;
+		openPicker(detail?.trigger);
+	}
+	dialog.addEventListener("close", () => {
+		const target = lastTrigger?.isConnected ? lastTrigger : document.querySelector<HTMLElement>("#display-settings-switch");
+		target?.focus({ preventScroll: true });
+	});
+	window.addEventListener(asciiPickerOpenEvent, handlePickerOpen);
 	root.querySelector("[data-close]")!.addEventListener("click", () => dialog.close());
 	dialog.addEventListener("click", (event) => {
 		if (event.target !== dialog) return;

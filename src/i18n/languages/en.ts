@@ -242,6 +242,7 @@ export const en: Translation = {
 	[Key.settingsWallpaper]: "Wallpaper",
 	[Key.settingsWallpaperEffects]: "Wallpaper Effects",
 	[Key.settingsBanner]: "Banner Options",
+	[Key.asciiBannerScene]: "Home Scene",
 	[Key.settingsEffects]: "Effects",
 	[Key.settingsLayout]: "Layout",
 	[Key.settingsFeatures]: "Features",
